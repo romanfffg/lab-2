@@ -1,44 +1,132 @@
-class CaesarsCipher:
-    def __init__(self, file_path, shift):
-        self.file_path = file_path
-        self.shift = shift
-        self.content = self.encrypted_text = self.decrypted_text = None
-
-    def read_file(self):
-        with open(self.file_path, 'r', encoding='utf8') as f:
-            self.content = ''.join([line for line in f])
-
-    def __helper(self, action='encrypt'):
-        text = list(self.content)
-        if action == 'decrypt':
-            text = list(self.encrypted_text)
-            self.shift = -self.shift
-        alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        alphabet += alphabet.lower()
-        half_length = len(alphabet) // 2
-        for i in range(len(text)):
-            if text[i] in alphabet:
-                index_in_alphabet = alphabet.index(text[i])
-                new_letter_index = (index_in_alphabet + self.shift) % half_length
-                if index_in_alphabet > half_length - 1:
-                    new_letter_index += half_length
-                text[i] = alphabet[new_letter_index]
-        return ''.join(text)
-
-    def encrypt_text(self):
-        self.encrypted_text = self.__helper()
-
-    def decrypt_text(self):
-        self.decrypted_text = self.__helper('decrypt')
-        print(self.decrypted_text == self.content)  # для проверки
-
-    def write_file(self):
-        with open('./encrypted.txt', 'w', encoding='utf8') as f:
-            f.write(self.encrypted_text)
+import random
 
 
-caesars_cipher = CaesarsCipher('./initial.txt', int(input('Shift: ')))
-caesars_cipher.read_file()
-caesars_cipher.encrypt_text()
-caesars_cipher.decrypt_text()
-caesars_cipher.write_file()
+
+
+alphabet = "абвгдежзиклмнопрстуфхцчшщыьэюя"
+
+
+
+
+def correct(lol):
+
+    text = "".join(lol)
+
+    text = text.lower()
+
+    text = text.replace("ъ","ь")
+
+    text = text.replace("ё","е")
+
+    text = text.replace("й","и")
+
+    text = text.replace(" ","ё")
+
+    return text
+
+
+
+
+def keygen():
+
+    index = list(range(len(alphabet)))
+
+    random.shuffle(index)
+
+    key = "".join([alphabet[i] for i in index])
+
+    f = open('key.txt', 'w')
+
+    for i in range(0, len(alphabet)):
+
+        f.write(alphabet[i] + ' ---> ' + key[i]+ '\n')
+
+    f.write('" " -> ё')
+
+    return key
+
+
+
+
+def crypt(b, key):
+
+    text = list(b)
+
+    for i in range(len(text)):
+
+        if text[i] in alphabet:
+
+            index = alphabet.index(text[i])
+
+            text[i] = key[index]
+
+    return "".join(text)
+
+
+
+
+def decrypt(b, key):
+
+    text = list(b)
+
+    for i in range(len(text)):
+
+        if text[i] in key:
+
+            index2 = key.index(text[i])
+
+            text[i] = alphabet[index2]
+
+    return "".join(text)
+
+
+
+
+def read():
+
+    text = ""
+
+    f = open('lukomorie.txt', 'r')
+
+    b = f.read()
+
+    text = "".join(b)
+
+    return text
+
+
+
+
+def write(dada):
+
+    f = open('lukomorieend.txt', 'w')
+
+    f.write(dada)
+
+
+
+
+def write_dec(a):
+
+    f = open('lukomorieend2.txt','w')
+
+    a = a.replace('ё',' ')
+
+    f.write(a)
+
+
+
+
+text = read()
+
+text = correct(text)
+
+key = keygen()
+
+text = crypt(text, key)
+
+write(text)
+
+text = decrypt(text, key)
+
+write_dec(text)
